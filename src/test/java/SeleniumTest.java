@@ -17,7 +17,7 @@ import java.util.List;
 
 public class SeleniumTest {
 
-    private WebDriver driver;
+    private ThreadLocal<WebDriver> driver = new ThreadLocal<>();
     private String browserName;
     private final String url = "https://www.njuskalo.hr";
     private NjuskaloHomePage njuskaloHomePage;
@@ -28,12 +28,16 @@ public class SeleniumTest {
     @Parameters("browser")
     public void setup(String browser) throws Exception {
         browserName = browser.toLowerCase();
-        driver = createRemoteDriver(browserName);
-        driver.manage().window().maximize();
-        driver.get(url);
+        driver.set(createRemoteDriver(browserName));
+        getDriver().manage().window().maximize();
+        getDriver().get(url);
 
-        njuskaloHomePage = new NjuskaloHomePage(driver);
+        njuskaloHomePage = new NjuskaloHomePage(getDriver());
         njuskaloHomePage.acceptPolicyPopup();
+    }
+
+    private WebDriver getDriver() {
+        return driver.get();
     }
 
     @Test(enabled = true)
@@ -52,10 +56,10 @@ public class SeleniumTest {
         String expectedTitle = "bicikl";
         njuskaloHomePage.searchFor("bicikl");
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
-        wait.until(ExpectedConditions.not(ExpectedConditions.titleIs(driver.getTitle())));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
+        wait.until(ExpectedConditions.not(ExpectedConditions.titleIs(getDriver().getTitle())));
 
-        Assert.assertTrue(driver.getTitle().contains(expectedTitle), "Search test failed!");
+        Assert.assertTrue(getDriver().getTitle().contains(expectedTitle), "Search test failed!");
         System.out.println("Test Passed for " + browser);
     }
 
@@ -64,7 +68,7 @@ public class SeleniumTest {
     public void testFooterLinks(String browser) {
         System.out.println("Starting test: testFooterLinks for " + browser);
         njuskaloHomePage.clickFooterLink();
-        Assert.assertNotEquals(driver.getCurrentUrl(), url, "Footer link did not navigate to Terms and Conditions.");
+        Assert.assertNotEquals(getDriver().getCurrentUrl(), url, "Footer link did not navigate to Terms and Conditions.");
         System.out.println("Footer Links Test Passed for " + browser);
     }
 
@@ -73,7 +77,7 @@ public class SeleniumTest {
     public void testNavigationMenu(String browser) {
         System.out.println("Starting test: testNavigationMenu for " + browser);
         njuskaloHomePage.navigateToMenuItem(0);
-        Assert.assertNotEquals(driver.getCurrentUrl(), url, "Navigation menu did not navigate.");
+        Assert.assertNotEquals(getDriver().getCurrentUrl(), url, "Navigation menu did not navigate.");
         System.out.println("Navigation Menu Test Passed for " + browser);
     }
 
@@ -82,7 +86,7 @@ public class SeleniumTest {
     public void testLoginButton(String browser) {
         System.out.println("Starting test: testLoginButton for " + browser);
         njuskaloHomePage.clickLoginButton();
-        njuskaloLoginPage = new NjuskaloLoginPage(driver);
+        njuskaloLoginPage = new NjuskaloLoginPage(getDriver());
         Assert.assertTrue(njuskaloLoginPage.isLoginPageDisplayed(), "Login page did not open correctly.");
         System.out.println("Login Button Test Passed for " + browser);
     }
@@ -95,11 +99,11 @@ public class SeleniumTest {
         String subCategory = "Osobni automobili";
         njuskaloHomePage.navigateToCategory(categoryName, subCategory);
 
-        njuskaloCategoryPage = new NjuskaloCategoryPage(driver);
+        njuskaloCategoryPage = new NjuskaloCategoryPage(getDriver());
         String sortingOption = "S nižom cijenom";
         njuskaloCategoryPage.selectSortingOption(sortingOption);
 
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
         wait.until(ExpectedConditions.visibilityOfAllElements(njuskaloCategoryPage.getAdPrices()));
 
         List<WebElement> prices = njuskaloCategoryPage.getAdPrices();
@@ -126,7 +130,7 @@ public class SeleniumTest {
     @AfterMethod
     public void teardown() {
         if (driver != null) {
-            driver.quit();
+            getDriver().quit();
             System.out.println("Closed " + browserName);
         }
     }
