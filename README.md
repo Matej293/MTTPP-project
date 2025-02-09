@@ -35,7 +35,6 @@ Selenium je popularan okvir (framework) za testiranje web aplikacija koji omogu�
 
 - Preuzeti i instalirati gore navedene alate
 - Klonirati ovaj repozitorij s [GitHuba](https://github.com/Matej293/MTTPP-project) u `C:\Users\<user>\IdeaProjects\` i otvoriti ga u [IntelliJ]((https://www.jetbrains.com/idea/download/?section=windows#section=windows))
-- Desni klik na projekt u gornjem lijevom kutu -> Maven -> Sync project
 - Preuzeti [Apache Maven](https://maven.apache.org/download.cgi) u željenu mapu i postaviti bin direktorij u system `PATH` putanju (npr. <br>`C:\Program Files\apache-maven-3.9.9\bin`)
 - Preuzeti [Selenium server](https://github.com/SeleniumHQ/selenium/releases/download/selenium-4.28.0/selenium-server-4.28.1.jar) i postaviti ga u željenu mapu
 - Pokrenuti komandnu liniju u mapi gdje se nalazi `selenium-server-4.28.1.jar` i pokrenuti komandu:
